@@ -1,0 +1,16 @@
+# Virtual environment
+venv/
+
+# Logs and reports
+logs/
+*.log
+
+# Trash folder (duplicates moved here)
+trash/
+
+# Environment variables
+.env
+
+# System files
+__pycache__/
+.DS_Storevenv
