@@ -12,7 +12,7 @@ import json  # standard lib: reading/writing JSON
 
 # ---------------- Helper: File Hashing ----------------
 '''
-This function opens the file in binary mode and reads it in chunks to avoid memory issues with large files.
+Poop -  This function opens the file in binary mode and reads it in chunks to avoid memory issues with large files.
 it then feeds the chunks into the hash function to return a unique hash value representing 
 the file's contents.'''
 
