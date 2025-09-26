@@ -1,7 +1,6 @@
 from tools.music_duplicates import find_duplicates, save_duplicate_log
-from tools.music_rename import rename_tracks
+from tools.music_rename import rename_tracks, save_rename_log
 
-#DOES NOT SAVE LOGS - ONLY SHOWS IN CONSOLE ATM
 def main():
     print("\n🎵 SAGE 2.5 Music Agent 🎵")
     print("Choose a tool:")
@@ -21,7 +20,8 @@ def main():
         folder = input("Enter the folder path to scan for renames: ").strip()
         dry_run = input("Dry run? (y/n): ").strip().lower() == "y"
         report = rename_tracks(folder, dry_run=dry_run)
-        print(f"\n✅ Renames processed. Report:\n{report}")
+        paths = save_rename_log(report)   # <-- new line
+        print(f"\n✅ Renames processed. Logs saved at:\n- {paths['json']}\n- {paths['txt']}")
 
     else:
         print("👋 Exiting... Goodbye!")
