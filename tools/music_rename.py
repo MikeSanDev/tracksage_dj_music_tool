@@ -148,3 +148,46 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", dry_run: boo
         renamed_tracks=renamed,     # matches the schema
         skipped_tracks=skipped    
     )
+
+# ---------------- Save Logs: JSON + TXT ------------------
+def save_rename_log(report: RenameReport, log_dir: str = "logs"):
+    """
+    Save the RenameReport to disk in two formats:
+      1) JSON  - machine-readable, good for automation/AI training
+      2) TXT   - human-readable audit trail
+    Returns dict of paths so caller can print or use them.
+    """
+    os.makedirs(log_dir, exist_ok=True)
+
+    base_name = f"renamed_{report.timestamp}"
+    json_path = os.path.join(log_dir, f"{base_name}.json")
+    txt_path  = os.path.join(log_dir, f"{base_name}.txt")
+
+    # JSON log
+    with open(json_path, "w", encoding="utf-8") as f:
+        f.write(report.model_dump_json(indent=2))
+
+    # TXT log
+    with open(txt_path, "w", encoding="utf-8") as f:
+        f.write(f"Rename Report\n")
+        f.write(f"Folder   : {report.folder}\n")
+        f.write(f"Run      : {report.timestamp}\n")
+        f.write(f"Renamed  : {len(report.renamed_tracks)} file(s)\n")
+        f.write(f"Skipped  : {len(report.skipped_tracks)} file(s)\n")
+        f.write("-" * 60 + "\n\n")
+
+        # Log renamed files
+        for i, entry in enumerate(report.renamed_tracks, start=1):
+            f.write(f"[{i}] {entry.original}\n")
+            f.write(f"    → {entry.new_path}\n")
+            f.write(f"    Tags: {entry.artist} - {entry.title}\n\n")
+
+        # Log skipped files
+        if report.skipped_tracks:
+            f.write("Skipped files:\n")
+            for i, entry in enumerate(report.skipped_tracks, start=1):
+                f.write(f"[{i}] {entry.original} (Reason: {entry.reason})\n")
+        else:
+            f.write("No files were skipped.\n")
+
+    return {"json": json_path, "txt": txt_path}
