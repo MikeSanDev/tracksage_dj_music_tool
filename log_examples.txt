@@ -1,4 +1,4 @@
-<strong>Duplicate Report</strong>
+Duplicate Report
 Folder   : c:\Users\Michael\Music\Soundcloud Downloads\duplicates
 Run      : 2025-09-29_17-19-54
 Found    : 3 duplicate(s)
@@ -19,7 +19,7 @@ Found    : 3 duplicate(s)
     DUPLICATE: c:\Users\Michael\Music\duplicates\Musiq Soulchild - Just Friends (Sunny) - Copy.mp3
     MOVED TO : trash\2025-09-29_17-19-54\Musiq Soulchild - Just Friends (Sunny) - Copy.mp3
 
-<strong>JSON:</strong>
+JSON:
 {
   "folder": "c:\\Users\\Michael\\Music\\Soundcloud Downloads\\duplicates",
   "timestamp": "2025-09-29_17-19-54",
@@ -46,7 +46,7 @@ Found    : 3 duplicate(s)
 }
 
 
-<strong>Rename Report</strong>
+Rename Report
 Folder   : c:\Users\Michael\Music\Soundcloud Downloads\Chill Hip-Hop
 Run      : 2025-09-25_22-08-33
 Renamed  : 18 file(s)
@@ -65,7 +65,7 @@ Skipped  : 0 file(s)
     → c:\Users\Michael\Music\Soundcloud Downloads\Chill Hip-Hop\BA5TIE - about him.mp3
     Tags: BA5TIE - about him
 
-<strong>JSON:</strong>
+JSON:
 {
   "folder": "c:\\Users\\Michael\\Music\\Soundcloud Downloads\\Chill Hip-Hop",
   "timestamp": "2025-09-25_22-08-33",
