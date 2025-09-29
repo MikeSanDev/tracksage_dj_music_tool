@@ -10,6 +10,8 @@ from datetime import datetime
 from schemas.music_schema import DuplicateEntry, DuplicateReport
 import json  # standard lib: reading/writing JSON
 
+
+
 # ---------------- Helper: File Hashing ----------------
 '''
 Poop -  This function opens the file in binary mode and reads it in chunks to avoid memory issues with large files.
@@ -29,7 +31,9 @@ def get_file_hash(path, chunk_size=8192):
 
 # *Sentinel value* = a marker that means “stop” (in our case b'' = end of file).
 
-# ---------------- Find and Move Duplicates Function ----------------
+
+
+# ---------------- Helper: Find and Move Duplicates Function ----------------
 
 def find_duplicates(folder: str, trash_dir: str = "trash") -> DuplicateReport:
     """
@@ -56,22 +60,31 @@ def find_duplicates(folder: str, trash_dir: str = "trash") -> DuplicateReport:
                 file_hash = get_file_hash(path)
 
                 # Detect and handle duplicates
-                if file_hash in seen: # Duplicate found → move it to Trash
-                                    new_path = os.path.join(session_trash, file)
-                                    shutil.move(path, new_path) # Physically moves the duplicate file into Trash
+                if file_hash in seen:
+                    current_original = seen[file_hash]
 
-                                    # Logs this duplicate as a DuplicateEntry
-                                    duplicates_removed.append(
-                                        DuplicateEntry(
-                                            original=seen[file_hash],   # the "keeper"
-                                            duplicate=path,             # the file we’re removing
-                                            dupe_moved_to=new_path,     # where it was moved
-                                            hash=file_hash              # fingerprint of the file
-                                        )
-                                    )
+                    # Decide which file should be kept
+                    better_file = prefer_original(current_original, path)
+                    worse_file = path if better_file == current_original else current_original
+
+                    # Move the worse file to Trash
+                    new_path = os.path.join(session_trash, os.path.basename(worse_file))
+                    shutil.move(worse_file, new_path)
+
+                    # Log the removal
+                    duplicates_removed.append(
+                        DuplicateEntry(
+                            original=better_file,        # the chosen file
+                            duplicate=worse_file,        # the one trashed
+                            dupe_moved_to=new_path,
+                            hash=file_hash
+                        )
+                    )
+
+                    # Update the original in case it changed
+                    seen[file_hash] = better_file
                 else:
-                                    # if first time seeing this file → keep it
-                                    seen[file_hash] = path
+                    seen[file_hash] = path
 
     # Return a structured report of the operation
     return DuplicateReport(
@@ -80,7 +93,40 @@ def find_duplicates(folder: str, trash_dir: str = "trash") -> DuplicateReport:
         duplicates_removed=duplicates_removed
     )
 
-# ---------------- Save Logs: JSON + TXT ------------------
+
+
+# ---------------- Helper: Keep the Original ----------------
+def prefer_original(original_file: str, duplicate_file: str) -> str:
+    """
+    Decide which file path should be kept (the 'original').
+    Uses naming clues like 'copy' or '(1)' to prefer the cleaner name.
+    """
+    original_name = os.path.basename(original_file).lower() # Get only the filename, ignore case
+    duplicate_name = os.path.basename(duplicate_file).lower() # Get only the filename, ignore case
+
+    # If the original looks like a copy but the duplicate doesn’t → keep the duplicate
+    if ("copy" in original_name or "(" in original_name) and not ("copy" in duplicate_name or "(" in duplicate_name):
+        return duplicate_file
+    # If the duplicate looks like a copy but the original doesn’t → keep the original
+    if ("copy" in duplicate_name or "(" in duplicate_name) and not ("copy" in original_name or "(" in original_name):
+        return original_file
+
+    # Otherwise, fall back to alphabetical order (deterministic tie-breaker)
+    return min(original_file, duplicate_file)
+
+'''
+    -The two IF blocks implement a simple heuristic: filenames 
+    containing “copy” or parentheses like “(1)” are more likely to be 
+    duplicates created by the OS, so we do not prefer them.
+
+    -If both look equally “original” (or equally “copy-ish”), 
+    we pick the alphabetically first one to be deterministic (so runs are repeatable).
+
+'''
+
+
+
+# ---------------- Helper: Save Logs: JSON + TXT ------------------
 # A helper that will save the report to a JSON file and a human-readable TXT file to save_duplicate_log.py
 # JSON is great for structured data, TXT is easy for humans to read
 
