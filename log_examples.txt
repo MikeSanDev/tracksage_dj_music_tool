@@ -14,12 +14,12 @@ Found    : 3 duplicate(s)
     DUPLICATE: c:\Users\Michael\Music\duplicates\Mario - How Do I Breathe (Radio Edit) - Copy.mp3
     MOVED TO : trash\2025-09-29_17-19-54\Mario - How Do I Breathe (Radio Edit) - Copy.mp3
 
-[3] HASH     : 7623d4b671c787e5212efb6c5761e918
-    ORIGINAL : c:\Users\Michael\Music\duplicates\Musiq Soulchild - Just Friends (Sunny).mp3
-    DUPLICATE: c:\Users\Michael\Music\duplicates\Musiq Soulchild - Just Friends (Sunny) - Copy.mp3
-    MOVED TO : trash\2025-09-29_17-19-54\Musiq Soulchild - Just Friends (Sunny) - Copy.mp3
 
-JSON:
+
+
+
+
+JSON REPORT:
 {
   "folder": "c:\\Users\\Michael\\Music\\Soundcloud Downloads\\duplicates",
   "timestamp": "2025-09-29_17-19-54",
@@ -35,15 +35,14 @@ JSON:
       "duplicate": "c:\\Users\\Michael\\Music\\Soundcloud Downloads\\duplicates\\Mario - How Do I Breathe (Radio Edit) - Copy.mp3",
       "dupe_moved_to": "trash\\2025-09-29_17-19-54\\Mario - How Do I Breathe (Radio Edit) - Copy.mp3",
       "hash": "f1e81e3b34b7a439fb260b9f7061f9c4"
-    },
-    {
-      "original": "c:\\Users\\Michael\\Music\\Soundcloud Downloads\\duplicates\\Musiq Soulchild - Just Friends (Sunny).mp3",
-      "duplicate": "c:\\Users\\Michael\\Music\\Soundcloud Downloads\\duplicates\\Musiq Soulchild - Just Friends (Sunny) - Copy.mp3",
-      "dupe_moved_to": "trash\\2025-09-29_17-19-54\\Musiq Soulchild - Just Friends (Sunny) - Copy.mp3",
-      "hash": "7623d4b671c787e5212efb6c5761e918"
     }
   ]
 }
+
+
+
+
+
 
 
 Rename Report
@@ -57,15 +56,15 @@ Skipped  : 0 file(s)
     → c:\Users\Michael\Music\Soundcloud Downloads\Chill Hip-Hop\A Vibe Called B ™ - Beyoncé x TEK.LUN - Party (A Vibe Called B - Blend).mp3
     Tags: A Vibe Called B ™ - Beyoncé x TEK.LUN - Party (A Vibe Called B - Blend)
 
-[2] c:\Users\Michael\Music\Soundcloud Downloads\Chill Hip-Hop\[B E N  B A D A  B O O M] REVOLVER OCELOT.mp3
-    → c:\Users\Michael\Music\Soundcloud Downloads\Chill Hip-Hop\Ben Bada Boom - REVOLVER OCELOT.mp3
-    Tags: Ben Bada Boom - REVOLVER OCELOT
-
-[3] c:\Users\Michael\Music\Soundcloud Downloads\Chill Hip-Hop\[BA5TIE] about him.mp3
+[2] c:\Users\Michael\Music\Soundcloud Downloads\Chill Hip-Hop\[BA5TIE] about him.mp3
     → c:\Users\Michael\Music\Soundcloud Downloads\Chill Hip-Hop\BA5TIE - about him.mp3
     Tags: BA5TIE - about him
 
-JSON:
+
+
+
+
+JSON REPORT:
 {
   "folder": "c:\\Users\\Michael\\Music\\Soundcloud Downloads\\Chill Hip-Hop",
   "timestamp": "2025-09-25_22-08-33",
@@ -75,12 +74,6 @@ JSON:
       "new_path": "c:\\Users\\Michael\\Music\\A Vibe Called B - Beyoncé x TEK.LUN - Party (A Vibe Called B - Blend).mp3",
       "artist": "A Vibe Called B ™",
       "title": "Beyoncé x TEK.LUN - Party (A Vibe Called B - Blend)"
-    },
-    {
-      "original": "c:\\Users\\Michael\\Music\\[B E N  B A D A  B O O M] REVOLVER OCELOT.mp3",
-      "new_path": "c:\\Users\\Michael\\Music\\Ben Bada Boom - REVOLVER OCELOT.mp3",
-      "artist": "Ben Bada Boom",
-      "title": "REVOLVER OCELOT"
     },
     {
       "original": "c:\\Users\\Michael\\Music\[BA5TIE] about him.mp3",
