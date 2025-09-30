@@ -57,10 +57,14 @@ venv\Scripts\activate      # Windows
 ```
 
 3. **Install dependencies**
-```pip install -r requirements.txt```
+```
+pip install -r requirements.txt
+```
 
-4. **Run the app**
-```python main.py```
+5. **Run the app**
+```
+python main.py
+```
 
 🖥️ Usage
 
