@@ -14,7 +14,7 @@ import json  # standard lib: reading/writing JSON
 
 # ---------------- Helper: File Hashing ----------------
 '''
-Poop -  This function opens the file in binary mode and reads it in chunks to avoid memory issues with large files.
+This function opens the file in binary mode and reads it in chunks to avoid memory issues with large files.
 it then feeds the chunks into the hash function to return a unique hash value representing 
 the file's contents.'''
 
@@ -99,19 +99,33 @@ def find_duplicates(folder: str, trash_dir: str = "trash") -> DuplicateReport:
 def prefer_original(original_file: str, duplicate_file: str) -> str:
     """
     Decide which file path should be kept (the 'original').
-    Uses naming clues like 'copy' or '(1)' to prefer the cleaner name.
+    We prefer files that:
+    - DON'T contain 'copy' (case-insensitive)
+    - DON'T contain patterns like '(1)', '(2)', etc.
+    If both look equally 'original', we keep the alphabetically first one.
     """
-    original_name = os.path.basename(original_file).lower() # Get only the filename, ignore case
-    duplicate_name = os.path.basename(duplicate_file).lower() # Get only the filename, ignore case
+    # Helper to check if a filename looks like a copy
+    def looks_like_copy(name: str) -> bool:
+        lower = name.lower() # Case insensitive check
+        return (
+            "copy" in lower or
+            any(f"({i})" in lower for i in range(1, 9))  # catches (1), (2)...(5)
+        )
 
-    # If the original looks like a copy but the duplicate doesn’t → keep the duplicate
-    if ("copy" in original_name or "(" in original_name) and not ("copy" in duplicate_name or "(" in duplicate_name):
+    original_name = os.path.basename(original_file) # Extracts only the filename from the full path
+    duplicate_name = os.path.basename(duplicate_file) # Extracts only the filename from the full path
+
+    original_is_copy = looks_like_copy(original_name) # True if original looks like a copy
+    duplicate_is_copy = looks_like_copy(duplicate_name) # True if duplicate looks like a copy
+    
+    # If one looks like a copy and the other doesn't, prefer the non-copy
+    # e.g. "song.mp3" beats "song (1).mp3"
+    if original_is_copy and not duplicate_is_copy:
         return duplicate_file
-    # If the duplicate looks like a copy but the original doesn’t → keep the original
-    if ("copy" in duplicate_name or "(" in duplicate_name) and not ("copy" in original_name or "(" in original_name):
+    if duplicate_is_copy and not original_is_copy:
         return original_file
 
-    # Otherwise, fall back to alphabetical order (deterministic tie-breaker)
+    # If both are copy-ish OR both are clean, fallback is alphabetical
     return min(original_file, duplicate_file)
 
 '''
