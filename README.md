@@ -46,78 +46,50 @@ sage2.5_music_agent/
 └── venv/ # Local virtual environment (gitignored)
 
 1. **Clone the repo**
-   ```bash
+   ```
    git clone https://github.com/yourusername/sage2.5_music_agent.git
    cd sage2.5_music_agent
    
-2. Create a virtual environment
-python -m venv venv
+2. **Create a virtual environment**
+```python -m venv venv
 source venv/bin/activate   # Mac/Linux
 venv\Scripts\activate      # Windows
+```
 
-3. Install dependencies
-pip install -r requirements.txt
+3. **Install dependencies**
+```pip install -r requirements.txt```
 
-4. Run the app
-python main.py
+4. **Run the app**
+```python main.py```
 
 🖥️ Usage
 
 When you run python main.py, you’ll see a menu:
-
+```
 🎵 SAGE 2.5 Music Agent 🎵
 Choose a tool:
 1) Detect duplicates
 2) Rename tracks
 3) Exit
+```
+### 1. Detect Duplicates
+- Enter the path to the folder you want to scan.  
+- Duplicates will be moved to `trash/<timestamp>/`.  
+- Logs saved under:
+  - `logs/duplicates_<timestamp>.json`
+  - `logs/duplicates_<timestamp>.txt`
 
-1. Detect Duplicates
-
-Enter the path to the folder you want to scan.
-
-Duplicates will be moved to trash/<timestamp>/.
-
-Logs saved under logs/duplicates_<timestamp>.json and .txt.
-
-2. Rename Tracks
-
-Enter the folder path to scan for MP3 renames.
-
-Choose Dry Run (y) to preview or (n) to apply changes.
-
-Renamed files will overwrite their filenames.
-
-Logs saved under logs/renamed_<timestamp>.json and .txt.
-
+### 2. Rename Tracks
+- Enter the folder path to scan for MP3 renames.  
+- Choose Dry Run:
+  - `y` → preview changes
+  - `n` → apply changes  
+- Renamed files will overwrite their filenames.  
+- Logs saved under:
+  - `logs/renamed_<timestamp>.json`
+  - `logs/renamed_<timestamp>.txt`
+  - 
 📑 Example Logs
-
-Duplicate log (JSON):
-
-{
-  "folder": "c:/Users/Michael/Music/duplicates",
-  "timestamp": "2025-09-25_17-33-44",
-  "duplicates_removed": [
-    {
-      "original": "c:/Users/Michael/Music/duplicates/Song.mp3",
-      "duplicate": "c:/Users/Michael/Music/duplicates/Song - Copy.mp3",
-      "dupe_moved_to": "trash/2025-09-25_17-33-44/Song - Copy.mp3",
-      "hash": "98a8162f7df742e..."
-    }
-  ]
-}
-
-
-Rename log (TXT):
-
-Rename Report
-Folder   : c:/Users/Michael/Music/RnB
-Run      : 2025-09-25_21-57-07
-Renamed  : 3 file(s)
-Skipped  : 1 file(s)
-------------------------------------------------------------
-
-[1] c:/Users/Michael/Music/RnB/[AKON] Smack That.mp3
-    → c:/Users/Michael/Music/RnB/Akon - Smack That.mp3
-    Tags: Akon - Smack That
+- Checkout Example logs in the logs_example.txt file.
 
   *  This is a personal learning project. Free to use, modify, or extend.
