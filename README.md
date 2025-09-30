@@ -33,17 +33,17 @@ This is a personal utility project designed for learning about agents, automatio
 
 ## 📂 Project Structure  
 sage2.5_music_agent/
-├── agents/ # (future agents can live here)
-├── logs/ # JSON + TXT logs saved here
-├── schemas/
-│ └── music_schema.py # Pydantic models for structured reports
-├── tools/
-│ ├── music_duplicates.py # Duplicate detection logic
-│ └── music_rename.py # Track renaming logic
-├── trash/ # Duplicates moved here with timestamps
-├── main.py # CLI entrypoint
-├── requirements.txt # Main dependencies
-└── venv/ # Local virtual environment (gitignored)
+-├── agents/ # (future agents can live here)
+-├── logs/ # JSON + TXT logs saved here
+-├── schemas/
+-│ └── music_schema.py # Pydantic models for structured reports
+-├── tools/
+-│ ├── music_duplicates.py # Duplicate detection logic
+-│ └── music_rename.py # Track renaming logic
+-├── trash/ # Duplicates moved here with timestamps
+-├── main.py # CLI entrypoint
+-├── requirements.txt # Main dependencies
+-└── venv/ # Local virtual environment (gitignored)
 
 1. **Clone the repo**
    ```
