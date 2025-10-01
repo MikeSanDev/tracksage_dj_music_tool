@@ -4,8 +4,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 
-# ---------------- Duplicate Logs ----------------
+# ------------------------ Duplication/Manipulation Models  ------------------------
+# We will be using schemas to define the structure of our logs and reports
+# This way we can ensure consistency and make it easier to generate and parse these logs
 
+# ---------------- Duplicate Logs ----------------
 # Each duplicate will be represented as an object following this structure
 class DuplicateEntry(BaseModel):
     original: str      # the file we keep (the first copy found)
@@ -18,7 +21,6 @@ class DuplicateReport(BaseModel):
     folder: str                   # which folder we scanned
     timestamp: str                # when the scan happened (YYYY-MM-DD_HH-MM-SS)
     duplicates_removed: List[DuplicateEntry]  # all the duplicates we found and moved
-
 
 
 # ---------------- Track Manipulation ----------------
@@ -40,3 +42,30 @@ class RenameReport(BaseModel):
     timestamp: str                  # when the operation happened (YYYY-MM-DD_HH-MM-SS)
     renamed_tracks: List[RenamedTrack]  # all the tracks we successfully renamed
     skipped_tracks: List[SkippedTrack]   # all the tracks we skipped and why
+
+
+
+
+
+# ------------------------ AI Schema Models ------------------------
+# These models capture the structure of AI suggestions and decisions made during processing
+# They help log what the AI recommended and what actions were taken.
+
+# ---------------- AI Suggestions ----------------
+# Each AI suggestion will be represented as an object following this structure
+class AISuggestion(BaseModel):
+    file: str             # the file path we analyzed
+    current_name: str     # existing filename
+    ai_suggested: str     # AI's suggested rename (e.g. "Daft Punk - Face to Face.mp3")
+    accepted: bool        # whether we applied it or not
+    reason: Optional[str] # optional note (e.g. "tags missing, AI filled in")
+    
+
+# ---------------- Unified Session Report ----------------
+# This combines duplication, renaming, and AI suggestions into one session report
+class SessionReport(BaseModel):
+    folder: str
+    timestamp: str
+    duplicates: Optional[DuplicateReport] = None # one of these can be None if that operation wasn't performed
+    renames: Optional[RenameReport] = None # one of these can be None if that operation wasn't performed
+    ai_suggestions: List[AISuggestion] = [] # all AI suggestions made during this session
