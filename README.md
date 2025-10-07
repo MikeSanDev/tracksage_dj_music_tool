@@ -19,6 +19,7 @@ This is a personal utility project designed for learning about agents, automatio
 - Uses filename heuristics to decide which file to **keep** (e.g., prefers clean names like `Track.mp3` over `Track - Copy (1).mp3`).  
 - Moves duplicates into `trash/<timestamp>/` for review.  
 - Logs all results to both JSON and TXT.
+ </br>
 DEMO:
 ![sage_duplicate](https://github.com/user-attachments/assets/ae164190-c40b-4c74-8ec6-28b45f81410a)
 
@@ -30,7 +31,8 @@ DEMO:
   - Sanitizes names to remove illegal characters (`<>:"/\|?*`).  
   - Ensures uniqueness (`Song.mp3`, `Song (1).mp3`, etc.).  
   - Has a **Dry Run mode** to preview changes before committing.  
-  - Logs renamed/skipped files into JSON and TXT.  
+  - Logs renamed/skipped files into JSON and TXT.
+    </br>
 DEMO:
 ![sage_rename](https://github.com/user-attachments/assets/a2fe9bd9-7a5e-40dd-a76f-a65300f84adf)
 
