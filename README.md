@@ -20,6 +20,7 @@ This is a personal utility project designed for learning about agents, automatio
 - Moves duplicates into `trash/<timestamp>/` for review.  
 - Logs all results to both JSON and TXT.
   </br>
+  </br>
 DEMO:
 ![sage_duplicate](https://github.com/user-attachments/assets/c1b00ebe-2d8b-4b8a-bd53-129d31fa80f5)
 
@@ -31,7 +32,8 @@ DEMO:
   - Ensures uniqueness (`Song.mp3`, `Song (1).mp3`, etc.).  
   - Has a **Dry Run mode** to preview changes before committing.  
   - Logs renamed/skipped files into JSON and TXT.
-    </br>
+  </br>
+  </br>
 DEMO:
 ![sage_rename](https://github.com/user-attachments/assets/a2fe9bd9-7a5e-40dd-a76f-a65300f84adf)
 
