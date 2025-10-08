@@ -3,7 +3,7 @@ from datetime import datetime
 #re: regex for sanitizing filenames
 import re
 #typing: for type hints
-from typing import Any, Optional, Tuple  
+from typing import Any, Optional, Union
 #mutagen: library for reading MP3 ID3 Tags
 from mutagen.easyid3 import EasyID3
 from mutagen import File # type: ignore[attr-defined] public API
@@ -13,12 +13,19 @@ from schemas.music_schema import RenameReport, RenamedTrack, SkippedTrack
 
 
 # ---------------- Normalize Tag Values ------------------
-def _first_or_none(value):
-    """Mutagen can return a list; pick first value or None."""
-    if isinstance(value, list) and value: #if empty list
-        return value[0]                   #return first item
-    return value if value else None       #return value or None if empty
-
+def _first_or_none(value: Optional[Union[str, list[Any]]]) -> Optional[str]: 
+    """
+    Mutagen can return a string, a list of strings, or None.
+    This function ensures we always get a single string or None.
+    """
+    # If it's a list and not empty, return its first element
+    if isinstance(value, list) and value:
+        return str(value[0])
+    # If it's already a string, return it as-is
+    if isinstance(value, str):
+        return value
+    # Otherwise, return None (no valid value)
+    return None
 
 # ---------------- Get Tags with Fallback ------------------
 def read_id3_artist_title(path: str):
@@ -57,18 +64,30 @@ def read_id3_artist_title(path: str):
 # ---------------- Sanitize Filename Component ----------------
 INVALID_CHARS = r'<>:"/\\|?*'  # forbidden in Windows filenames
 
-def sanitize_component(text) -> str:
+
+def sanitize_component(text: str) -> str:
     """
-    Make a filename component safe:
-    - replace forbidden characters with '-'
-    - collapse multiple spaces
-    - strip trailing spaces/dots (Windows quirk)
+    Make a filename component safe and clean:
+    - Replace forbidden characters with '-'
+    - Collapse multiple spaces
+    - Strip trailing spaces/dots (Windows quirk)
+    - Normalize casing (ALL CAPS -> Title Case)
     """
     if not text:  # catches None, "", or anything falsy
         return ""
-    text = re.sub(f"[{re.escape(INVALID_CHARS)}]", "-", text)  # replace bad chars
-    text = re.sub(r"\s+", " ", text).strip()                  # collapse spaces
-    return text.rstrip(" .")                                  # strip trailing dots/spaces
+
+    # Replace forbidden characters (like < > : " / \ | ? *)
+    text = re.sub(f"[{re.escape(INVALID_CHARS)}]", "-", text)
+
+    # Collapse multiple spaces and trim leading/trailing whitespace
+    text = re.sub(r"\s+", " ", text).strip()
+
+    # Normalize casing: convert ALL CAPS → Title Case
+    if text.isupper():
+        text = text.title()
+
+    # Strip any trailing dots or spaces (Windows quirk)
+    return text.rstrip(" .")
 
 # ---------------- Ensure Unique Path ----------------
 def uniquify_path(target_path: str) -> str:
@@ -90,7 +109,7 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", dry_run: boo
     """
     Rename all .mp3 files in a folder using ID3 tags.
     - pattern: controls the naming scheme (default "Artist - Title")
-    - dry_run: if True, show what *would* happen but don’t rename
+    - dry_run: if True, show what *would* happen but does not rename
     Returns: RenameReport with renamed_tracks + skipped_tracks
     """
 
@@ -112,8 +131,8 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", dry_run: boo
                 continue
 
             # 2) Sanitize & build new name
-            safe_artist = sanitize_component(artist)
-            safe_title = sanitize_component(title)
+            safe_artist = sanitize_component(str(artist or "")) #handles None by converting to empty string
+            safe_title = sanitize_component(str(title or ""))
             new_name = pattern.format(artist=safe_artist, title=safe_title).strip()
             if not new_name:
                 skipped.append(SkippedTrack(original=src_path, reason="empty name after sanitize"))
