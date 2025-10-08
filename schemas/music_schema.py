@@ -4,9 +4,11 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 
+
 # ------------------------ Duplication/Manipulation Models  ------------------------
 # We will be using schemas to define the structure of our logs and reports
 # This way we can ensure consistency and make it easier to generate and parse these logs
+
 
 # ---------------- Duplicate Logs ----------------
 # Each duplicate will be represented as an object following this structure
@@ -21,6 +23,7 @@ class DuplicateReport(BaseModel):
     folder: str                   # which folder we scanned
     timestamp: str                # when the scan happened (YYYY-MM-DD_HH-MM-SS)
     duplicates_removed: List[DuplicateEntry]  # all the duplicates we found and moved
+
 
 
 # ---------------- Track Manipulation ----------------
@@ -42,8 +45,6 @@ class RenameReport(BaseModel):
     timestamp: str                  # when the operation happened (YYYY-MM-DD_HH-MM-SS)
     renamed_tracks: List[RenamedTrack]  # all the tracks we successfully renamed
     skipped_tracks: List[SkippedTrack]   # all the tracks we skipped and why
-
-
 
 
 
