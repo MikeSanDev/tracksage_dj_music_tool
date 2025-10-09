@@ -13,10 +13,10 @@ from schemas.music_schema import RenameReport, RenamedTrack, SkippedTrack
 
 
 # ---------------- Normalize Tag Values ------------------
-def _first_or_none(value: Optional[Union[str, list[Any]]]) -> Optional[str]: 
+def _first_or_none(value: Optional[Union[str, list[Any]]]) -> Optional[str]:  #the optional is shorthand for Union[str, None] - either return a string or none
     """
     Mutagen can return a string, a list of strings, or None.
-    This function ensures we always get a single string or None.
+    This function makes sure we always get a single string or None.
     """
     # If it's a list and not empty, return its first element
     if isinstance(value, list) and value:
