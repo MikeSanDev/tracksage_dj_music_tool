@@ -41,9 +41,10 @@ DEMO:
 # Get Started
 
 1. **Clone the repo**
-   ```
-   git clone https://github.com/yourusername/sage2.5_music_agent.git
-   cd sage2.5_music_agent
+```
+git clone https://github.com/yourusername/sage2.5_music_agent.git
+cd sage2.5_music_agent
+```
    
 2. **Create a virtual environment**
 ```python -m venv venv
