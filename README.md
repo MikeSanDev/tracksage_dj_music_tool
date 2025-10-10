@@ -38,6 +38,7 @@ DEMO:
 ![sage_rename](https://github.com/user-attachments/assets/a2fe9bd9-7a5e-40dd-a76f-a65300f84adf)
 
 ---
+# Get Started
 
 1. **Clone the repo**
    ```
