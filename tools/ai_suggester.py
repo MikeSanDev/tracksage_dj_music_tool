@@ -14,26 +14,21 @@ Example use:
 """
 
 import os
+import logging
 from typing import Optional
 from openai import OpenAI  # ← we'll use OpenAI GPT-4o-mini
 from dotenv import load_dotenv 
 
 # --- OpenAI client  ---
-load_dotenv()  
+load_dotenv()
 client = OpenAI()
+logging.basicConfig(filename="logs/ai_suggest_errors.log", level=logging.WARNING)
+
 
 def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title_hint: Optional[str] = None) -> Optional[str]:
     """
-    Ask the AI to suggest a clean, standardized filename in the format:
+    Suggest a clean, standardized filename in the format:
     'Artist - Title.mp3'
-
-    Args:
-        filename: The current messy filename (e.g. 'daft_punk-face2face.mp3')
-        artist_hint: (optional) a partial artist tag if we have one
-        title_hint: (optional) a partial title tag if we have one
-
-    Returns:
-        A string suggestion like "Daft Punk - Face to Face.mp3", or None if failed.
     """
 
      # 1️⃣ Prepare the AI prompt with examples and context
@@ -55,14 +50,14 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
     - Input: "theweeknd_save_your_tears(remix).mp3" → Output: "The Weeknd - Save Your Tears (Remix).mp3"
     - Input: "songtitle(feat_dojacat)" → Output: "Unknown Artist - Song Title (feat. Doja Cat).mp3"
 
-    Now, here’s the file to clean:
+    Now, here is the file to clean:
     Filename: {filename}
     Artist hint: {artist_hint or 'None'}
     Title hint: {title_hint or 'None'}
     """
 
     try:
-        # 2️⃣ Send it to GPT-4o-mini for lightweight, fast inference
+        # Send it to GPT-4o-mini for lightweight, fast inference
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -72,7 +67,7 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
             temperature=0.3,  # lower = more consistent naming
         )
 
-        # 3️⃣ Extract the AI’s suggestion (strip newlines/spaces just in case)
+        # Extract the AI’s suggestion (strip newlines/spaces just in case)
         content = response.choices[0].message.content
         if content is not None:
             suggestion = content.strip()
@@ -80,7 +75,7 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
             print(f"⚠️ AI response did not contain a suggestion for {filename}.")
             return None
 
-        # 4️⃣ Add .mp3 if missing
+        # Add .mp3 if missing
         if not suggestion.lower().endswith(".mp3"):
             suggestion += ".mp3"
 
