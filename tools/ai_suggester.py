@@ -68,12 +68,15 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
         )
 
         # Extract the AI’s suggestion (strip newlines/spaces just in case)
+        if not hasattr(response, "choices") or not response.choices:
+                print(f"⚠️ No AI response for {filename}")
+                return None
+
         content = response.choices[0].message.content
-        if content is not None:
-            suggestion = content.strip()
-        else:
-            print(f"⚠️ AI response did not contain a suggestion for {filename}.")
-            return None
+        suggestion = content.strip() if content else None
+        if not suggestion:
+                print(f"⚠️ Empty AI output for {filename}")
+                return None
 
         # Add .mp3 if missing
         if not suggestion.lower().endswith(".mp3"):
