@@ -7,6 +7,7 @@ from typing import Any, Optional, Union
 #mutagen: library for reading MP3 ID3 Tags
 from mutagen.easyid3 import EasyID3
 from mutagen import File # type: ignore[attr-defined] public API
+from tools.ai_suggester import suggest_name_with_ai
 
 #import schemas for type-safty and structured data
 from schemas.music_schema import RenameReport, RenamedTrack, SkippedTrack
@@ -124,11 +125,25 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", dry_run: boo
 
             src_path = os.path.join(root, file)
 
-            # 1) Read tags
+            # 1) Read tags (artist + title) - If tags are missing, try AI fallback instead of skipping
             artist, title = read_id3_artist_title(src_path)
-            if not artist or not title:
-                skipped.append(SkippedTrack(original=src_path, reason="missing tags"))
-                continue
+            if not artist or not title: 
+                ai_suggestion = suggest_name_with_ai(file, artist_hint=artist, title_hint=title)
+                if ai_suggestion:
+                    dst_path = os.path.join(root, ai_suggestion)
+                    dst_path = uniquify_path(dst_path)
+                    if not dry_run:
+                        os.rename(src_path, dst_path)
+                    renamed.append(RenamedTrack(
+                        original=src_path,
+                        new_path=dst_path,
+                        artist=artist or "AI Suggested",
+                        title=title or "AI Suggested"
+                    ))
+                    continue
+                else:
+                    skipped.append(SkippedTrack(original=src_path, reason="missing tags + AI failed"))
+                    continue
 
             # 2) Sanitize & build new name
             safe_artist = sanitize_component(str(artist or "")) #handles None by converting to empty string
