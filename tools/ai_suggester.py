@@ -1,4 +1,3 @@
-
 """
 AI Rename Suggester
 -------------------
@@ -8,30 +7,62 @@ When a track has missing or unreliable tags, this script asks an AI model
 to infer the most likely "Artist - Title.mp3" name based on the filename
 and any tag fragments that exist.
 
-Example use:
+Example:
     from tools.ai_suggester import suggest_name_with_ai
     new_name = suggest_name_with_ai("Daft_Punk-Face2Face.mp3")
+    print(new_name)  # → "Daft Punk - Face to Face.mp3"
 """
 
 import os
+import json
 import logging
 from typing import Optional
-from openai import OpenAI  # ← we'll use OpenAI GPT-4o-mini
-from dotenv import load_dotenv 
+from openai import OpenAI
+from dotenv import load_dotenv
 
-# --- OpenAI client  ---
+# --- Setup: environment + client + logging ---
 load_dotenv()
 client = OpenAI()
 logging.basicConfig(filename="logs/ai_suggest_errors.log", level=logging.WARNING)
 
+# ---------------- Caching ---------------- #
+CACHE_PATH = "data/ai_cache.json"
 
+# Ensure data directory exists
+os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
+
+# Load existing cache (if any)
+try:
+    with open(CACHE_PATH, "r", encoding="utf-8") as f:
+        AI_CACHE = json.load(f)
+except FileNotFoundError:
+    AI_CACHE = {}  # empty cache on first run
+except json.JSONDecodeError:
+    AI_CACHE = {}  # corrupted or empty file fallback
+
+
+def save_cache():
+    """Persist current cache to disk."""
+    with open(CACHE_PATH, "w", encoding="utf-8") as f:
+        json.dump(AI_CACHE, f, indent=2, ensure_ascii=False)
+
+
+# ---------------- Core Function ---------------- #
 def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title_hint: Optional[str] = None) -> Optional[str]:
     """
     Suggest a clean, standardized filename in the format:
     'Artist - Title.mp3'
+
+    Uses local cache before calling the OpenAI API.
     """
 
-     # 1️⃣ Prepare the AI prompt with examples and context
+    # ✅ Check cache first
+    if filename in AI_CACHE:
+        cached = AI_CACHE[filename]
+        print(f"🔁 Using cached AI suggestion for: {filename}")
+        return cached
+
+    # 🧠 Build the AI prompt
     base_prompt = f"""
     You are an expert in cleaning and standardizing MP3 filenames.
     Given a raw filename and any partial tags, suggest the best formatted name
@@ -50,40 +81,44 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
     - Input: "theweeknd_save_your_tears(remix).mp3" → Output: "The Weeknd - Save Your Tears (Remix).mp3"
     - Input: "songtitle(feat_dojacat)" → Output: "Unknown Artist - Song Title (feat. Doja Cat).mp3"
 
-    Now, here is the file to clean:
     Filename: {filename}
     Artist hint: {artist_hint or 'None'}
     Title hint: {title_hint or 'None'}
     """
 
     try:
-        # Send it to GPT-4o-mini for lightweight, fast inference
+        # 🧩 Send request to GPT-4o-mini
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful AI assistant for cleaning and formatting music filenames."},
-                {"role": "user", "content": base_prompt}
+                {"role": "user", "content": base_prompt},
             ],
-            temperature=0.3,  # lower = more consistent naming
+            temperature=0.3,
         )
 
-        # Extract the AI’s suggestion (strip newlines/spaces just in case)
+        # 🧩 Validate response
         if not hasattr(response, "choices") or not response.choices:
-                print(f"⚠️ No AI response for {filename}")
-                return None
+            print(f"⚠️ No AI response for {filename}")
+            return None
 
         content = response.choices[0].message.content
         suggestion = content.strip() if content else None
         if not suggestion:
-                print(f"⚠️ Empty AI output for {filename}")
-                return None
+            print(f"⚠️ Empty AI output for {filename}")
+            return None
 
-        # Add .mp3 if missing
+        # 🧩 Normalize extension
         if not suggestion.lower().endswith(".mp3"):
             suggestion += ".mp3"
+
+        # ✅ Save to cache
+        AI_CACHE[filename] = suggestion
+        save_cache()
 
         return suggestion
 
     except Exception as e:
+        logging.warning(f"AI rename failed for {filename}: {e}")
         print(f"⚠️ AI rename failed for {filename}: {e}")
         return None
