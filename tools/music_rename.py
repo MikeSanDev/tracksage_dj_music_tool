@@ -106,11 +106,11 @@ def uniquify_path(target_path: str) -> str:
         i += 1
 
 # ---------------- Rename Tracks ------------------
-def rename_tracks(folder: str, pattern: str = "{artist} - {title}", dry_run: bool = False) -> RenameReport:
+def rename_tracks(folder: str, pattern: str = "{artist} - {title}", test_run: bool = False) -> RenameReport:
     """
     Rename all .mp3 files in a folder using ID3 tags.
     - pattern: controls the naming scheme (default "Artist - Title")
-    - dry_run: if True, show what *would* happen but does not rename
+    - test_run: if True, show what *would* happen but does not rename
     Returns: RenameReport with renamed_tracks + skipped_tracks
     """
 
@@ -132,7 +132,7 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", dry_run: boo
                 if ai_suggestion:
                     dst_path = os.path.join(root, ai_suggestion)
                     dst_path = uniquify_path(dst_path)
-                    if not dry_run:
+                    if not test_run:
                         os.rename(src_path, dst_path)
                     renamed.append(RenamedTrack(
                         original=src_path,
@@ -165,8 +165,8 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", dry_run: boo
             # 4) Ensure uniqueness
             dst_path = uniquify_path(dst_path)
 
-            # 5) Rename (unless dry_run)
-            if not dry_run:
+            # 5) Rename (unless test_run)
+            if not test_run:
                 os.rename(src_path, dst_path)
 
             renamed.append(RenamedTrack(
