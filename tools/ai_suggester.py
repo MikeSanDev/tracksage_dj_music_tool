@@ -1,3 +1,14 @@
+# OS lets us walk through directories and join file paths
+import os
+# lets you read/write structured data to disk (e.g. cache file)
+import json
+# standard library for saving warning/error messages to a log file.
+import logging
+# a type hint meaning “this value can either be of the given type or None.”
+from typing import Optional
+from openai import OpenAI
+from dotenv import load_dotenv
+
 """
 AI Rename Suggester
 -------------------
@@ -13,13 +24,6 @@ Example:
     print(new_name)  # → "Daft Punk - Face to Face.mp3"
 """
 
-import os
-import json
-import logging
-from typing import Optional
-from openai import OpenAI
-from dotenv import load_dotenv
-
 # --- Setup: environment + client + logging ---
 load_dotenv()
 client = OpenAI()
@@ -28,19 +32,19 @@ logging.basicConfig(filename="logs/ai_suggest_errors.log", level=logging.WARNING
 # ---------------- Caching ---------------- #
 CACHE_PATH = "data/ai_cache.json"
 
-# Ensure data directory exists
+# Checks if data directory exists, creates one if not
 os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 
 # Load existing cache (if any)
-try:
-    with open(CACHE_PATH, "r", encoding="utf-8") as f:
+try: 
+    with open(CACHE_PATH, "r", encoding="utf-8") as f: # load cache from file
         AI_CACHE = json.load(f)
 except FileNotFoundError:
     AI_CACHE = {}  # empty cache on first run
 except json.JSONDecodeError:
     AI_CACHE = {}  # corrupted or empty file fallback
 
-
+# Function to save cache
 def save_cache():
     """Persist current cache to disk."""
     with open(CACHE_PATH, "w", encoding="utf-8") as f:
@@ -50,19 +54,19 @@ def save_cache():
 # ---------------- Core Function ---------------- #
 def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title_hint: Optional[str] = None) -> Optional[str]:
     """
-    Suggest a clean, standardized filename in the format:
+    SAGE suggests a clean, standardized filename in the format:
     'Artist - Title.mp3'
 
-    Uses local cache before calling the OpenAI API.
+    Uses local saved cache before calling the OpenAI API.
     """
 
-    # ✅ Check cache first
+    # Checks cache first before making API call - to save money and time
     if filename in AI_CACHE:
         cached = AI_CACHE[filename]
         print(f"🔁 Using cached AI suggestion for: {filename}")
         return cached
 
-    # 🧠 Build the AI prompt
+    # AI prompt
     base_prompt = f"""
     You are an expert in cleaning and standardizing MP3 filenames.
     Given a raw filename and any partial tags, suggest the best formatted name
@@ -87,7 +91,7 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
     """
 
     try:
-        # 🧩 Send request to GPT-4o-mini
+        # Send request to GPT-4o-mini
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -97,7 +101,7 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
             temperature=0.3,
         )
 
-        # 🧩 Validate response
+        # Validate response
         if not hasattr(response, "choices") or not response.choices:
             print(f"⚠️ No AI response for {filename}")
             return None
@@ -108,16 +112,17 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
             print(f"⚠️ Empty AI output for {filename}")
             return None
 
-        # 🧩 Normalize extension
+        # Normalize 
         if not suggestion.lower().endswith(".mp3"):
             suggestion += ".mp3"
 
-        # ✅ Save to cache
+        # Save to cache
         AI_CACHE[filename] = suggestion
         save_cache()
 
         return suggestion
-
+    
+    #this exception handles any errors from the OpenAI API or other issues
     except Exception as e:
         logging.warning(f"AI rename failed for {filename}: {e}")
         print(f"⚠️ AI rename failed for {filename}: {e}")

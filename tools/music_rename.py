@@ -1,3 +1,4 @@
+# OS lets us walk through directories and join file paths
 import os
 from datetime import datetime
 #re: regex for sanitizing filenames
