@@ -1,6 +1,6 @@
-# 🎵 SAGE 2.5 Music Agent  
+# 🎵 TrackSAGE — DJ Music Tool 
 
-SAGE 2.5 is a local-first **music file management agent** that helps you:  
+**TrackSAGE** is a local-first **AI-powered music organization tool for DJs** that helps keep your library clean, consistent, and performance-ready. TrackSage can help you:
 
 - ✅ **Detect and remove duplicate MP3s** (using file hashing + smart filename heuristics)  
 - ✅ **Rename MP3s** based on their ID3 tags (`Artist - Title`)  
@@ -66,7 +66,7 @@ python main.py
 
 When you run python main.py, you’ll see a menu:
 ```
-🎵 SAGE 2.5 Music Agent 🎵
+🎵 TrackSAGE - DJ Tool 🎵
 Choose a tool:
 1) Detect duplicates
 2) Rename tracks
