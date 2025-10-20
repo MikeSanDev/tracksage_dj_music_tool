@@ -27,9 +27,12 @@ Example:
 # --- Setup: environment + client + logging ---
 load_dotenv()
 client = OpenAI()
-logging.basicConfig(filename="logs/ai_suggest_errors.log", level=logging.WARNING)
+#Configures Python’s logger to save warnings into logs/ai_suggest_errors.log
+logging.basicConfig(filename="logs/ai_suggest_errors.log", level=logging.WARNING) 
+
 
 # ---------------- Caching ---------------- #
+# defines the location of the JSON file storing cached AI results
 CACHE_PATH = "data/ai_cache.json"
 
 # Checks if data directory exists, creates one if not
@@ -37,18 +40,24 @@ os.makedirs(os.path.dirname(CACHE_PATH), exist_ok=True)
 
 # Load existing cache (if any)
 try: 
-    with open(CACHE_PATH, "r", encoding="utf-8") as f: # load cache from file
-        AI_CACHE = json.load(f)
+    with open(CACHE_PATH, "r", encoding="utf-8") as f: # Opens the file for reading and automatically closes it when done
+        AI_CACHE = json.load(f) # Converts the JSON data in the file into a Python dictionary
 except FileNotFoundError:
     AI_CACHE = {}  # empty cache on first run
 except json.JSONDecodeError:
     AI_CACHE = {}  # corrupted or empty file fallback
 
+"""
+Using a try-except block here ensures that if the cache file is missing or corrupted,
+the program won't crash. Instead, it will start with an empty cache. 
+Using a dict because its good for fast lookups or updates.
+"""
+
 # Function to save cache
 def save_cache():
-    """Persist current cache to disk."""
-    with open(CACHE_PATH, "w", encoding="utf-8") as f:
-        json.dump(AI_CACHE, f, indent=2, ensure_ascii=False)
+    """this function saves current cache to disk."""
+    with open(CACHE_PATH, "w", encoding="utf-8") as f:  # opens the file for writing
+        json.dump(AI_CACHE, f, indent=2, ensure_ascii=False) # writes the dictionary to disk in valid JSON format
 
 
 # ---------------- Core Function ---------------- #
@@ -60,9 +69,12 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
     Uses local saved cache before calling the OpenAI API.
     """
 
-    # Checks cache first before making API call - to save money and time
-    if filename in AI_CACHE:
-        cached = AI_CACHE[filename]
+    # Normalize the filename (makes caching consistent across folders and capitalization)
+    normalized = os.path.basename(filename).lower().strip()
+
+    # Check cache before making API call - saves money and time
+    if normalized in AI_CACHE:
+        cached = AI_CACHE[normalized]
         print(f"🔁 Using cached AI suggestion for: {filename}")
         return cached
 
@@ -102,22 +114,22 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
         )
 
         # Validate response
-        if not hasattr(response, "choices") or not response.choices:
+        if not hasattr(response, "choices") or not response.choices: # checks if an object has a given attribute
             print(f"⚠️ No AI response for {filename}")
-            return None
+            return None # If there’s no choices attribute or it’s empty, the model didn’t reply → return None
 
-        content = response.choices[0].message.content
-        suggestion = content.strip() if content else None
+        content = response.choices[0].message.content # response.choices → list of possible completions (we take the first one)
+        suggestion = content.strip() if content else None # removes whitespace and newlines
         if not suggestion:
             print(f"⚠️ Empty AI output for {filename}")
             return None
 
-        # Normalize 
+        # Normalize - converts to lowercase and checks if it ends with .mp3
         if not suggestion.lower().endswith(".mp3"):
             suggestion += ".mp3"
 
         # Save to cache
-        AI_CACHE[filename] = suggestion
+        AI_CACHE[normalized] = suggestion # store the suggestion in the cache dictionary
         save_cache()
 
         return suggestion
