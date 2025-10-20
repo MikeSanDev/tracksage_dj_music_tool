@@ -15,19 +15,29 @@ def main():
 
     # ----- OPTION 1: Inspect Tags -----
     if choice == "1":
-        folder = input("Enter the folder path to inspect: ").strip()
+        raw_input = input("Enter the folder path to inspect: ").strip()
+        folder = raw_input.replace("&", "").replace("'", "").replace('"', "").strip()
+        check_tags(folder)
         check_tags(folder)
 
     # ----- OPTION 2: Detect Duplicates -----
     elif choice == "2":
-        folder = input("Enter the folder path to scan for duplicates: ").strip()
+        raw_input = input("Enter the folder path to scan for duplicates: ").strip()
+        folder = raw_input.replace("&", "").replace("'", "").replace('"', "").strip()
+        report = find_duplicates(folder)
         report = find_duplicates(folder)
         paths = save_duplicate_log(report)
         print(f"\n✅ Duplicates processed. Logs saved at:\n- {paths['json']}\n- {paths['txt']}")
 
     # ----- OPTION 3: Rename Tracks -----
     elif choice == "3":
-        folder = input("Enter the folder path to scan for renames: ").strip()
+        raw_input = input("Enter the folder path to scan for renames: ").strip()
+
+        # Clean PowerShell drag-drop quirks (handles &, single, and double quotes)
+        folder = raw_input
+        folder = folder.replace("&", "").replace("'", "").replace('"', "").strip()
+
+        # print(f"[DEBUG] Folder interpreted as: {repr(folder)}")  # for testing folder path issues
         test_run = input("Would you like to run a test (dry run)? (y/n): ").strip().lower() == "y"
 
         print("\n🔄 Scanning Folder...")
