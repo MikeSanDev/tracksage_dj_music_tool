@@ -14,7 +14,7 @@ This is a personal utility project designed for learning about agents, automatio
 ## ⚙️ Features  
 
 ### 1. Duplicate Detector  
-- Scans a folder (recursively) for `.mp3` files.  
+- Scans a folder (recursively) for `.mp3` and or `.wav` files.  
 - Computes an **MD5 hash** of file contents (so even renamed copies are caught).  
 - Uses filename heuristics to decide which file to **keep** (e.g., prefers clean names like `Track.mp3` over `Track - Copy (1).mp3`).  
 - Moves duplicates into `trash/<timestamp>/` for review.  
