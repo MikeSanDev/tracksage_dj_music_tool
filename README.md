@@ -2,8 +2,10 @@
 
 **TrackSAGE** is a local-first **AI-powered music organization tool for DJs** that helps keep your library clean, consistent, and performance-ready. TrackSage can help you:
 
+- ✅ **Inspect Tags** (using Mutagen)  
 - ✅ **Detect and remove duplicate MP3s** (using file hashing + smart filename heuristics)  
-- ✅ **Rename MP3s** based on their ID3 tags (`Artist - Title`)  
+- ✅ **Rename MP3s** based on their ID3 tags (`Artist - Title`)
+- ✅ **Audio Transcription** (using Whisper by Open AI)  
 - 📂 **Log all operations** into machine-readable JSON and human-readable TXT for transparency  
 - 🛡️ **Safe Trash system** – no files are permanently deleted; duplicates are moved into `trash/` with a timestamp  
 
