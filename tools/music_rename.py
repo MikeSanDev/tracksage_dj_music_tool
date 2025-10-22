@@ -7,60 +7,101 @@ import re
 from typing import Any, Optional, Union
 #mutagen: library for reading MP3 ID3 Tags
 from mutagen.easyid3 import EasyID3
+#mutagen: library for reading WAV metadata
+from mutagen.wave import WAVE  # enables reading basic WAV metadata
 from mutagen import File # type: ignore[attr-defined] public API
 from tools.ai_suggester import suggest_name_with_ai
-
-#import schemas for type-safty and structured data
 from schemas.music_schema import RenameReport, RenamedTrack, SkippedTrack
 
+# ---------------- Console Colors ---------------- 
+# these are color codes for outputting colored text in the terminal
+GREEN = "\033[92m"   # success
+YELLOW = "\033[93m"  # warning / skipped
+BLUE = "\033[94m"    # AI rename
+RESET = "\033[0m"    # reset to default
 
 # ---------------- Normalize Tag Values ------------------
-def _first_or_none(value: Optional[Union[str, list[Any]]]) -> Optional[str]:  #the optional is shorthand for Union[str, None] - either return a string or none
+def _first_or_none(value: Optional[Union[str, list[Any], bytes]]) -> Optional[str]:
     """
-    Mutagen can return a string, a list of strings, or None.
-    This function makes sure we always get a single string or None.
+    Mutagen can return tag values as a string, list, bytes, or None.
+    This helper ensures we always return a single clean string or None.
     """
-    # If it's a list and not empty, return its first element
+
+    # If it's a list and not empty, return its first element as a string
     if isinstance(value, list) and value:
         return str(value[0])
-    # If it's already a string, return it as-is
+
+    # If it's already a string, return it directly
     if isinstance(value, str):
         return value
-    # Otherwise, return None (no valid value)
+
+    # If it's a bytes object (common in some WAV metadata), decode safely
+    if isinstance(value, bytes):
+        try:
+            return value.decode("utf-8", errors="ignore")
+        except Exception:
+            return None
+
+    # Otherwise, return None for unsupported types or missing values
     return None
 
-# ---------------- Get Tags with Fallback ------------------
-def read_id3_artist_title(path: str):
+# ---------------- Get Tags with Fallback  ------------------
+def read_audio_tags(path: str):
     """
-    This tries to read 'artist' and 'title' tags from an MP3 file.
+    Reads 'artist' and 'title' tags from MP3 and WAV files.
     Returns (artist, title) or (None, None) if unavailable.
     """
-    try: 
-        audio = EasyID3(path) # fast path for ID3-tagged MP3s
-        artist = _first_or_none(audio.get("artist")) #reads tag values
-        title  = _first_or_none(audio.get("title"))
-        return artist, title #returns tuple of strings or none
-    except Exception: #fallback for non-MP3 or non-ID3 files
-        # If EasyID3 fails (no ID3, weird file), we use this generic parser
-        try:
-            mf = File(path, easy=True)  #mutagen's generic file parser - checks for any tags
-            if mf is None or not getattr(mf, "tags", None):
-                return None, None                   # no tags at all
-            artist = _first_or_none(mf.tags.get("artist"))
-            title  = _first_or_none(mf.tags.get("title"))
-            return artist, title
-        except Exception:
-            return None, None  # unreadable or untagged
 
-"""     
--mf = File(path, easy=True)  #mutagen's generic file parser - checks for any tags
--it looks the file, guesses the format (Mp3, FLAC, etc.), and returns a file object
--if mutagen can't identify the file type, it returns None
--getattr(mf, "tags", None) checks if the 'tags' attribute exists in the file object, 
--if not return None instead of crashing
--Some MP3s do not have EasyID3 tags but do have generic tags.
--Some are not MP3s at all (you could accidentally scan FLAC/OGG/WAV), but with File(..., easy=True), you still get artist/title.
-"""  
+    try:
+        # ---------- MP3 PATH ----------
+        if path.lower().endswith(".mp3"):
+            audio = EasyID3(path)  # Reads standard ID3 metadata from MP3 files
+
+            # Mutagen can return a list, string, or None — so we normalize
+            artist_raw = audio.get("artist")
+            title_raw = audio.get("title")
+
+            artist = _first_or_none(artist_raw)  # ensure single string or None
+            title = _first_or_none(title_raw)
+            return artist, title  # returns tuple (artist, title) or (None, None)
+
+        # ---------- WAV PATH ----------
+        elif path.lower().endswith(".wav"):
+            audio = WAVE(path)  # Mutagen’s WAV parser - reads RIFF chunks from the WAV header
+            tags = getattr(audio, "tags", None)  # safely access tag data if it exists
+
+            if not tags:
+                return None, None  # WAV files often have no tags (especially DJ exports)
+
+            # WAV files store metadata in INFO chunks using different field names:
+            #  - IART = artist name
+            #  - INAM = track name (title)
+            # If unavailable, we try lowercase equivalents (in case of alternate tag sets)
+            artist_raw = tags.get("IART") or tags.get("artist")
+            title_raw = tags.get("INAM") or tags.get("title")
+
+            # Normalize to single strings (handles None, list, or bytes)
+            artist = _first_or_none(artist_raw)
+            title = _first_or_none(title_raw)
+            return artist, title
+
+        # ---------- UNSUPPORTED OR OTHER FORMATS ----------
+        else:
+            return None, None  # skip files that aren't MP3 or WAV
+
+    except Exception:
+        # Generic fallback: if anything goes wrong (e.g., unreadable tags, corrupted file),
+        # return None for both values so the AI fallback can step in.
+        return None, None
+
+
+"""
+- EasyID3(path) → reads ID3v2 tags from MP3 files (standard in most audio apps)
+- WAVE(path) → parses RIFF metadata from .wav files; most WAVs don’t include these tags
+- getattr(audio, "tags", None) → prevents attribute errors if no tags exist
+- Some WAVs only contain “INFO” chunks (IART, INAM) rather than typical ID3 fields
+- If tags are missing, we gracefully return (None, None) → triggering AI rename fallback
+"""
 
 
 # ---------------- Sanitize Filename Component ----------------
@@ -91,6 +132,16 @@ def sanitize_component(text: str) -> str:
     # Strip any trailing dots or spaces (Windows quirk)
     return text.rstrip(" .")
 
+# ---------------- Helper: Check if already correct ----------------
+def already_correct_name(file_path: str, artist: str, title: str) -> bool:
+    """
+    Returns True if the file's current name already matches the clean
+    'Artist - Title.mp3' pattern (case-insensitive, ignores extension).
+    """
+    base_name = os.path.splitext(os.path.basename(file_path))[0]
+    expected = f"{artist} - {title}".strip()
+    return base_name.lower().strip() == expected.lower().strip()
+
 # ---------------- Ensure Unique Path ----------------
 def uniquify_path(target_path: str) -> str:
     """
@@ -113,6 +164,10 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", test_run: bo
     - pattern: controls the naming scheme (default "Artist - Title")
     - test_run: if True, show what *would* happen but does not rename
     Returns: RenameReport with renamed_tracks + skipped_tracks
+
+    src_path = os.path.join(root, file) # full path to the *original source file
+    dst_path = os.path.join(root, new_name) # full path for the *new destination file
+    both paths are set to the same folder - only the filename changes
     """
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -121,20 +176,25 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", test_run: bo
     # Walk the folder tree
     for root, _, files in os.walk(folder):
         for file in files:
-            if not file.lower().endswith(".mp3"):
+            if not (file.lower().endswith(".mp3") or file.lower().endswith(".wav")):
                 continue  # skip non-mp3 files
 
             src_path = os.path.join(root, file)
 
             # 1) Read tags (artist + title) - If tags are missing, try AI fallback instead of skipping
-            artist, title = read_id3_artist_title(src_path)
+            artist, title = read_audio_tags(src_path)
             if not artist or not title: 
                 ai_suggestion = suggest_name_with_ai(file, artist_hint=artist, title_hint=title)
                 if ai_suggestion:
+                    # Preserve the original file extension (.mp3, .wav, etc.)
+                    ext = os.path.splitext(file)[1]
+                    ai_suggestion = f"{ai_suggestion}{ext}"
+
                     dst_path = os.path.join(root, ai_suggestion)
                     dst_path = uniquify_path(dst_path)
                     if not test_run:
                         os.rename(src_path, dst_path)
+                    print(f"{BLUE}🤖 AI Rename:{RESET} {os.path.basename(file)} → {os.path.basename(dst_path)}")
                     renamed.append(RenamedTrack(
                         original=src_path,
                         new_path=dst_path,
@@ -142,8 +202,10 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", test_run: bo
                         title=title or "AI Suggested"
                     ))
                     continue
+
                 else:
                     skipped.append(SkippedTrack(original=src_path, reason="missing tags + AI failed"))
+                    print(f"{YELLOW}⚠️ Skipped (missing tags + AI failed):{RESET} {os.path.basename(file)}")
                     continue
 
             # 2) Sanitize & build new name
@@ -153,22 +215,31 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", test_run: bo
             if not new_name:
                 skipped.append(SkippedTrack(original=src_path, reason="empty name after sanitize"))
                 continue
-            if not new_name.lower().endswith(".mp3"):
-                new_name += ".mp3"
+
+            # Preserve the original file extension (e.g. .mp3, .wav)
+            ext = os.path.splitext(file)[1]
+            new_name = f"{new_name}{ext}" if not new_name.lower().endswith(ext.lower()) else new_name
+
 
             dst_path = os.path.join(root, new_name)
 
-            # 3) Skip if already matches
-            if os.path.normcase(src_path) == os.path.normcase(dst_path):
-                skipped.append(SkippedTrack(original=src_path, reason="already matches target name"))
+            # 3) Skip if already correctly named
+            if already_correct_name(file, safe_artist, safe_title):
+                skipped.append(SkippedTrack(original=src_path, reason="already formatted correctly"))
+                print(f"{YELLOW}⚠️ Skipped (missing tags + AI failed):{RESET} {os.path.basename(file)}")
                 continue
 
-            # 4) Ensure uniqueness
-            dst_path = uniquify_path(dst_path)
+            # 4) Skip if destination file already exists (don’t create duplicates)
+            if os.path.exists(dst_path):
+                skipped.append(SkippedTrack(original=src_path, reason="target file already exists"))
+                continue
+
 
             # 5) Rename (unless test_run)
             if not test_run:
                 os.rename(src_path, dst_path)
+                print(f"{GREEN}✅ Renamed:{RESET} {os.path.basename(file)} → {os.path.basename(dst_path)}")
+
 
             renamed.append(RenamedTrack(
                 original=src_path,
@@ -176,6 +247,19 @@ def rename_tracks(folder: str, pattern: str = "{artist} - {title}", test_run: bo
                 artist=str(artist) if artist is not None else "",
                 title=str(title) if title is not None else ""
             ))
+
+    print("\n" + "-" * 60)
+    print(f"{GREEN}✅ Renamed: {len(renamed)}{RESET}")
+    print(f"{YELLOW}⚠️ Skipped: {len(skipped)}{RESET}")
+    print("-" * 60 + "\n")
+
+    '''
+    # prints a summary report to the console
+    ------------------------------------------------------------
+    ✅ Renamed: 1
+    ⚠️ Skipped: 1
+    ------------------------------------------------------------
+    '''
 
     return RenameReport(
         folder=folder,

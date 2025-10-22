@@ -118,15 +118,21 @@ def suggest_name_with_ai(filename: str, artist_hint: Optional[str] = None, title
             print(f"⚠️ No AI response for {filename}")
             return None # If there’s no choices attribute or it’s empty, the model didn’t reply → return None
 
-        content = response.choices[0].message.content # response.choices → list of possible completions (we take the first one)
-        suggestion = content.strip() if content else None # removes whitespace and newlines
+        content = response.choices[0].message.content
+        suggestion = content.strip() if content else None  # Define suggestion first
+
+        # Remove any accidental file extensions from AI output
+        if suggestion and suggestion.lower().endswith((".mp3", ".wav", ".flac", ".m4a")):
+            suggestion = os.path.splitext(suggestion)[0]
+
         if not suggestion:
             print(f"⚠️ Empty AI output for {filename}")
             return None
 
         # Normalize - converts to lowercase and checks if it ends with .mp3
-        if not suggestion.lower().endswith(".mp3"):
-            suggestion += ".mp3"
+        suggestion = suggestion.strip()
+        suggestion = " ".join(suggestion.split())  # removes double spaces
+        suggestion = suggestion.title() if suggestion.isupper() else suggestion # cleans up filenames that are in ALL CAPS but doesn’t over-capitalize mixed-case names like “e.e. cummings.”
 
         # Save to cache
         AI_CACHE[normalized] = suggestion # store the suggestion in the cache dictionary
