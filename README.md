@@ -70,9 +70,11 @@ When you run python main.py, you’ll see a menu:
 ```
 🎵 TrackSAGE - DJ Tool 🎵
 Choose a tool:
-1) Detect duplicates
-2) Rename tracks
-3) Exit
+1) Inspect Tags
+2) Detect duplicates
+3) Rename tracks
+4) Transcribe Audio
+5) Exit
 ```
 ### 1. Detect Duplicates
 - Enter the path to the folder you want to scan.  
