@@ -50,7 +50,7 @@ def transcribe_audio(file_path: str, summarize: bool = False): #since summary is
             info → metadata (i.e language, duration, etc.)
     """
 
-    # Write transcription to file
+    # Writes transcript to .txt file, piecing together segments with timestamps
     with open(txt_path, "w", encoding="utf-8") as f: #context manager to handle file operations - "w" = in write mode with utf-8 encoding
         f.write(f"Transcription ({file_path})\n")
         f.write(f"Language: {info.language}\n\n") #write language info from metadata
@@ -58,3 +58,38 @@ def transcribe_audio(file_path: str, summarize: bool = False): #since summary is
             f.write(f"[{segment.start:.2f}s → {segment.end:.2f}s] {segment.text}\n")
 
     print(f"\n✅ Transcription complete! Saved to:\n{txt_path}")
+
+     # Optional AI summarization - giving the option to just stay with the .txt plain text or summarize with OpenAI
+    if summarize:
+        #loading transcript (.txt) for summarization
+        print("\n🧠 Generating summary with OpenAI...")
+        with open(txt_path, "r", encoding="utf-8") as f: #open transcript file in read mode
+            transcript = f.read() #stores large string of the entire transcript in the variable 'transcript'
+        
+        try: #feeding transcript to OpenAI for summarization
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "You are an expert summarizer for lecture and course transcripts."},
+                    {"role": "user", "content": f"Summarize this transcript into key points:\n\n{transcript}"}
+                ],
+                temperature=0.3,
+            )
+            # Extract summary from response - logs it in to a .pdf in the same log folder
+            #summary = response.choices[0].message.content.strip()
+
+            #safer fallback option in case response is empty
+            content = response.choices[0].message.content if response.choices else None
+            summary = content.strip() if content else ""
+            
+            # write summary to file
+            with open(summary_path, "w", encoding="utf-8") as f:
+                f.write("AI Summary:\n\n")
+                f.write(summary)
+
+            print(f"\n📝 Summary saved at:\n{summary_path}")
+
+        except Exception as e:
+            print(f"⚠️ Summary generation failed: {e}")
+
+    print("\n🎧 Process finished!\n")
