@@ -1,6 +1,7 @@
 from tools.check_tags import check_tags
 from tools.music_duplicates import find_duplicates, save_duplicate_log
 from tools.music_rename import rename_tracks, save_rename_log
+from tools.transcribe_audio import transcribe_audio
 
 def main():
     print("\n🎵 SAGE 2.5 Music Agent 🎵")
@@ -52,7 +53,13 @@ def main():
 
     # ----- OPTION 4: Transcribe Audio (coming soon) -----
     elif choice == "4":
-        print("\n🎙️ Audio transcription feature coming soon...")
+        raw_input = input("Enter the full path of the audio file: ").strip()
+        file_path = raw_input.replace("&", "").replace("'", "").replace('"', "").strip()
+
+        summarize_choice = input("Would you like to summarize the transcript after? (y/n): ").strip().lower() == "y"
+
+        print("\n🎙️ Starting transcription...")
+        transcribe_audio(file_path, summarize=summarize_choice)
 
     # ----- OPTION 5: Exit -----
     else:
