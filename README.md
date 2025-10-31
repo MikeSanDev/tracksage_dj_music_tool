@@ -39,6 +39,17 @@ DEMO:
 DEMO:
 ![sage_rename](https://github.com/user-attachments/assets/a2fe9bd9-7a5e-40dd-a76f-a65300f84adf)
 
+### 3. Audio Transcription  
+- Converts speech from `.mp3`, `.wav`, and other supported formats into text using [`Faster-Whisper`](https://github.com/guillaumekln/faster-whisper).  
+- Detects language and timestamps automatically for each segment.  
+- Saves full transcripts into `logs/transcribed_<timestamp>.txt`.  
+- Optionally uses the **OpenAI API** to generate summarized notes of the transcript.  
+- Summaries are saved as `logs/ai_summary_<timestamp>.txt`.  
+- Designed for lectures, interviews, or long-form course recordings.  
+
+</br>
+</br>
+DEMO: 
 ---
 # Get Started
 
