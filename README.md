@@ -15,7 +15,17 @@ This is a personal utility project designed for learning about agents, automatio
 
 ## ⚙️ Features  
 
-### 1. Duplicate Detector  
+### 1. Inspect Tags  
+- Scans `.mp3` and `.wav` files using [`mutagen`](https://mutagen.readthedocs.io/) to extract metadata.  
+- Displays `artist`, `title`, `album`, and other available tags in the console.  
+- Helps identify missing or inconsistent ID3 metadata before renaming or organizing.  
+- Optionally logs all tag data into `logs/inspect_tags_<timestamp>.txt`.  
+
+</br>
+</br>
+DEMO:  
+
+### 2. Duplicate Detector  
 - Scans a folder (recursively) for `.mp3` and or `.wav` files.  
 - Computes an **MD5 hash** of file contents (so even renamed copies are caught).  
 - Uses filename heuristics to decide which file to **keep** (e.g., prefers clean names like `Track.mp3` over `Track - Copy (1).mp3`).  
@@ -26,7 +36,7 @@ This is a personal utility project designed for learning about agents, automatio
 DEMO:
 ![sage_duplicate](https://github.com/user-attachments/assets/c1b00ebe-2d8b-4b8a-bd53-129d31fa80f5)
 
-### 2. Renamer  
+### 3. Renamer  
 - Reads ID3 tags (`artist`, `title`) using [`mutagen`](https://mutagen.readthedocs.io/).  
 - Renames files into the format:
 
@@ -39,7 +49,7 @@ DEMO:
 DEMO:
 ![sage_rename](https://github.com/user-attachments/assets/a2fe9bd9-7a5e-40dd-a76f-a65300f84adf)
 
-### 3. Audio Transcription  
+### 4. Audio Transcription  
 - Converts speech from `.mp3`, `.wav`, and other supported formats into text using [`Faster-Whisper`](https://github.com/guillaumekln/faster-whisper).  
 - Detects language and timestamps automatically for each segment.  
 - Saves full transcripts into `logs/transcribed_<timestamp>.txt`.  
