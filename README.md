@@ -25,6 +25,11 @@ This is a personal utility project designed for learning about agents, automatio
 </br>
 DEMO:  
 
+https://github.com/user-attachments/assets/c43e3cea-a30c-48e3-83d4-4353fb4a6131
+
+
+
+
 ### 2. Duplicate Detector  
 - Scans a folder (recursively) for `.mp3` and or `.wav` files.  
 - Computes an **MD5 hash** of file contents (so even renamed copies are caught).  
@@ -60,6 +65,10 @@ DEMO:
 </br>
 </br>
 DEMO: 
+
+https://github.com/user-attachments/assets/b3bf6647-33c8-4021-a01c-56103843b993
+
+
 ---
 # Get Started
 
@@ -131,8 +140,11 @@ Choose a tool:
   - Transcript → `logs/transcribed_<timestamp>.txt`  
   - Summary → `logs/ai_summary_<timestamp>.txt`  
 
+---
 📑 Example Logs
 - Checkout Example logs in the logs_example.txt file.
+  
+---
 
 **This is a personal learning project. Free to use, modify, or extend.**
 </br>
