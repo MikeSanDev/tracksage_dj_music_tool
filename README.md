@@ -23,7 +23,9 @@ This is a personal utility project designed for learning about agents, automatio
 
 </br>
 </br>
-DEMO:  ![transcriptTest-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/0d44adab-0b61-4611-9e69-5cc440bb64e3)
+DEMO:
+![inspecttags](https://github.com/user-attachments/assets/ef2efcce-1fbd-4141-9a6f-8fb7ea9aebde)
+
 
 
 
@@ -63,7 +65,7 @@ DEMO:
 </br>
 </br>
 DEMO: 
-![inspecttags-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/3a2df84f-4c1b-4ee9-9dc4-a98fd2f28818)
+![transcriptTest](https://github.com/user-attachments/assets/c9ff059c-7baf-4ed4-ae34-2b45a8ea116c)
 
 
 
