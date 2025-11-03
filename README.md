@@ -97,23 +97,40 @@ Choose a tool:
 4) Transcribe Audio
 5) Exit
 ```
-### 1. Detect Duplicates
+### 1. Inspect Tags  
+- Enter the folder path to scan.  
+- Lists all tag information directly in the console or saves to logs.  
+
+---
+
+### 2. Detect Duplicates  
 - Enter the path to the folder you want to scan.  
 - Duplicates will be moved to `trash/<timestamp>/`.  
-- Logs saved under:
-  - `logs/duplicates_<timestamp>.json`
-  - `logs/duplicates_<timestamp>.txt`
+- Logs saved under:  
+  - `logs/duplicates_<timestamp>.json`  
+  - `logs/duplicates_<timestamp>.txt`  
 
-### 2. Rename Tracks
-- Enter the folder path to scan for MP3 renames.  
-- Choose Dry Run:
-  - `y` → preview changes
+---
+
+### 3. Rename Tracks  
+- Enter the folder path to scan for MP3/WAV renames.  
+- Choose Dry Run:  
+  - `y` → preview changes  
   - `n` → apply changes  
 - Renamed files will overwrite their filenames.  
-- Logs saved under:
-  - `logs/renamed_<timestamp>.json`
-  - `logs/renamed_<timestamp>.txt`
-  - 
+- Logs saved under:  
+  - `logs/renamed_<timestamp>.json`  
+  - `logs/renamed_<timestamp>.txt`  
+
+---
+
+### 4. Transcribe Audio  
+- Provide a single audio file path.  
+- Optionally choose to summarize the transcript.  
+- Saves:  
+  - Transcript → `logs/transcribed_<timestamp>.txt`  
+  - Summary → `logs/ai_summary_<timestamp>.txt`  
+
 📑 Example Logs
 - Checkout Example logs in the logs_example.txt file.
 
