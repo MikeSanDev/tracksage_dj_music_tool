@@ -34,7 +34,7 @@ def transcribe_audio(file_path: str, summarize: bool = False): #since summary is
     os.makedirs(output_dir, exist_ok=True)
 
     txt_path = os.path.join(output_dir, f"transcribed_{base_name}_{timestamp}.txt")
-    summary_path = os.path.join(output_dir, f"ai_summary_{base_name}_{timestamp}.txt")
+    summary_path = os.path.join(output_dir, f"transcribed_ai_summary_{base_name}_{timestamp}.txt")
 
     print(f"\n ✍️ Transcribing: {file_path}\n(This may take a few minutes for larger files...)")
 
