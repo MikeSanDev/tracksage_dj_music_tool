@@ -24,11 +24,7 @@ This is a personal utility project designed for learning about agents, automatio
 </br>
 </br>
 DEMO:
-![inspecttags](https://github.com/user-attachments/assets/ef2efcce-1fbd-4141-9a6f-8fb7ea9aebde)
-
-
-
-
+![Inspect Tags Demo](images/inspecttags.gif)
 
 ### 2. Duplicate Detector  
 - Scans a folder (recursively) for `.mp3` and or `.wav` files.  
@@ -65,9 +61,7 @@ DEMO:
 </br>
 </br>
 DEMO: 
-![transcriptTest](https://github.com/user-attachments/assets/c9ff059c-7baf-4ed4-ae34-2b45a8ea116c)
-
-
+![Transcription Demo](images/transcriptTest.gif)
 
 ---
 # Get Started
