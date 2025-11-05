@@ -25,7 +25,7 @@ This is a personal utility project designed for learning about agents, automatio
 </br>
 DEMO:
 </br>
-![inspecttags]([https://github.com/user-attachments/assets/1a4cc983-32a2-48b3-a573-eeb5dd75c02d](https://github.com/MikeSanDev/tracksage_dj_music_tool/blob/main/images/inspecttags.gif?raw=true))
+![Inspect Tags Demo](https://raw.githubusercontent.com/MikeSanDev/tracksage_dj_music_tool/main/images/inspecttags.gif)
 
 ### 2. Duplicate Detector  
 - Scans a folder (recursively) for `.mp3` and or `.wav` files.  
@@ -63,7 +63,7 @@ DEMO:
 </br>
 DEMO: 
 </br>
-![transcriptTest]([https://github.com/user-attachments/assets/39d30c28-fab3-4030-a646-b20f32e0b087](https://github.com/MikeSanDev/tracksage_dj_music_tool/blob/main/images/transcriptTest.gif?raw=true))
+![Transcription Demo](https://raw.githubusercontent.com/MikeSanDev/tracksage_dj_music_tool/main/images/transcriptTest.gif)
 
 ---
 # Get Started
