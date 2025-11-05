@@ -24,7 +24,8 @@ This is a personal utility project designed for learning about agents, automatio
 </br>
 </br>
 DEMO:
-</br>
+
+
 ![Inspect Tags Demo](https://raw.githubusercontent.com/MikeSanDev/tracksage_dj_music_tool/main/images/inspecttags.gif)
 
 ### 2. Duplicate Detector  
@@ -61,8 +62,9 @@ DEMO:
 
 </br>
 </br>
-DEMO: 
-</br>
+DEMO:
+
+
 ![Transcription Demo](https://raw.githubusercontent.com/MikeSanDev/tracksage_dj_music_tool/main/images/transcriptTest.gif)
 
 ---
