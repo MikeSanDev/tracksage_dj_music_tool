@@ -25,6 +25,7 @@ This is a personal utility project designed for learning about agents, automatio
 </br>
 DEMO:
 ![Inspect Tags Demo](images/inspecttags.gif)
+![Inspect Tags Demo](images/inspecttags.gif)
 
 ### 2. Duplicate Detector  
 - Scans a folder (recursively) for `.mp3` and or `.wav` files.  
